@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { StoreService } from './store.service';
 import { CreateStoreDto } from './dto/create-store.dto';
 import { UpdateStoreDto } from './dto/update-store.dto';
@@ -7,14 +15,22 @@ import { UpdateStoreDto } from './dto/update-store.dto';
 export class StoreController {
   constructor(private readonly storeService: StoreService) {}
 
-  @Post()
-  create(@Body() createStoreDto: CreateStoreDto) {
-    return this.storeService.create(createStoreDto);
+  @Post('category')
+  async createCategory(@Body() createStoreDto: CreateStoreDto) {
+    const response = await this.storeService.createCategory(createStoreDto);
+    return response;
   }
 
-  @Get()
-  findAll() {
-    return this.storeService.findAll();
+  @Post('product')
+  async createProduct(@Body() createStoreDto: CreateStoreDto) {
+    const response = await this.storeService.createProduct(createStoreDto);
+    return response;
+  }
+
+  @Get('product')
+  async findAllProducts() {
+    const response = await this.storeService.findAllProducts();
+    return response;
   }
 
   @Get(':id')

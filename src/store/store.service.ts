@@ -1,15 +1,52 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateStoreDto } from './dto/create-store.dto';
 import { UpdateStoreDto } from './dto/update-store.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { Product } from './schemas/product.schema';
+import { Category } from './schemas/category.schema';
 
 @Injectable()
 export class StoreService {
-  create(createStoreDto: CreateStoreDto) {
-    return 'This action adds a new store';
+  constructor(
+    @InjectModel(Product.name) private productModel: Model<Product>,
+    @InjectModel(Category.name) private categoryModel: Model<Category>,
+  ) {}
+
+  async createCategory(createStoreDto: CreateStoreDto): Promise<string> {
+    const newCategory = new this.categoryModel(createStoreDto);
+    try {
+      const response: string = await newCategory
+        .save()
+        .then(() => `${newCategory._id}`);
+      return response;
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.CONFLICT);
+    }
   }
 
-  findAll() {
-    return `This action returns all store`;
+  async createProduct(createStoreDto: CreateStoreDto): Promise<string> {
+    const newProduct = new this.productModel(createStoreDto);
+    try {
+      const response: string = await newProduct
+        .save()
+        .then(() => `${newProduct._id}`);
+      return response;
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.CONFLICT);
+    }
+  }
+
+  async findAllProducts(): Promise<Product[]> {
+    try {
+      const response: Product[] = await this.productModel
+        .find({})
+        .populate({ path: 'categories', select: 'name' })
+        .exec();
+      return response;
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.FORBIDDEN);
+    }
   }
 
   findOne(id: number) {
