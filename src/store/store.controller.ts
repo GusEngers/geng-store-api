@@ -33,6 +33,12 @@ export class StoreController {
     return response;
   }
 
+  @Get('category')
+  async findAllCategories() {
+    const response = await this.storeService.findAllCategories();
+    return response;
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.storeService.findOne(+id);

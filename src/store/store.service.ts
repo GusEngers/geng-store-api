@@ -41,8 +41,20 @@ export class StoreService {
     try {
       const response: Product[] = await this.productModel
         .find({})
+        .select('-__v')
         .populate({ path: 'categories', select: 'name' })
         .exec();
+      return response;
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.FORBIDDEN);
+    }
+  }
+
+  async findAllCategories(): Promise<Category[]> {
+    try {
+      const response: Category[] = await this.categoryModel
+        .find({})
+        .select('-__v');
       return response;
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.FORBIDDEN);
