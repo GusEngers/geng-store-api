@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateStoreDto } from './dto/create-store.dto';
 import { UpdateStoreDto } from './dto/update-store.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, isObjectIdOrHexString } from 'mongoose';
 import { Product } from './schemas/product.schema';
 import { Category } from './schemas/category.schema';
 
@@ -46,7 +46,7 @@ export class StoreService {
         .exec();
       return response;
     } catch (error) {
-      throw new HttpException(error.message, HttpStatus.FORBIDDEN);
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -57,12 +57,28 @@ export class StoreService {
         .select('-__v');
       return response;
     } catch (error) {
-      throw new HttpException(error.message, HttpStatus.FORBIDDEN);
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} store`;
+  async findOneProduct(id: string): Promise<Product | null> {
+    if (!isObjectIdOrHexString(id))
+      throw new HttpException('Invalid ID format', HttpStatus.NOT_ACCEPTABLE);
+    try {
+      const response: Product | null = await this.productModel
+        .findById(id)
+        .select('-__v')
+        .populate({ path: 'categories', select: 'name' })
+        .exec();
+      if (!response)
+        throw new HttpException(
+          `Product with ID '${id}' not found`,
+          HttpStatus.NOT_FOUND,
+        );
+      return response;
+    } catch (error) {
+      throw new HttpException(error.message, error.status);
+    }
   }
 
   update(id: number, updateStoreDto: UpdateStoreDto) {

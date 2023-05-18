@@ -39,9 +39,10 @@ export class StoreController {
     return response;
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.storeService.findOne(+id);
+  @Get('product/:id')
+  async findOne(@Param('id') id: string) {
+    const response = await this.storeService.findOneProduct(id);
+    return response;
   }
 
   @Patch(':id')
