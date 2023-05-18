@@ -117,7 +117,35 @@ export class StoreService {
     }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} store`;
+  async removeProduct(id: string) {
+    if (!isObjectIdOrHexString(id))
+      throw new HttpException('Invalid ID format', HttpStatus.NOT_ACCEPTABLE);
+    try {
+      const response = await this.productModel.findByIdAndDelete(id);
+      if (!response)
+        throw new HttpException(
+          `Product with ID '${id}' not found`,
+          HttpStatus.NOT_FOUND,
+        );
+      return `Product '${response.name}' removed!`;
+    } catch (error) {
+      throw new HttpException(error.message, error.status);
+    }
+  }
+
+  async removeCategory(id: string) {
+    if (!isObjectIdOrHexString(id))
+      throw new HttpException('Invalid ID format', HttpStatus.NOT_ACCEPTABLE);
+    try {
+      const response = await this.categoryModel.findByIdAndDelete(id);
+      if (!response)
+        throw new HttpException(
+          `Category with ID '${id}' not found`,
+          HttpStatus.NOT_FOUND,
+        );
+      return `Category '${response.name}' removed!`;
+    } catch (error) {
+      throw new HttpException(error.message, error.status);
+    }
   }
 }

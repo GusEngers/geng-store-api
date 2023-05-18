@@ -60,8 +60,15 @@ export class StoreController {
     return response;
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.storeService.remove(+id);
+  @Delete('product/:id')
+  async removeProduct(@Param('id') id: string) {
+    const response = await this.storeService.removeProduct(id);
+    return response;
+  }
+
+  @Delete('category/:id')
+  async removeCategory(@Param('id') id: string) {
+    const response = await this.storeService.removeCategory(id);
+    return response;
   }
 }
