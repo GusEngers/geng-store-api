@@ -45,6 +45,12 @@ export class StoreController {
     return response;
   }
 
+  @Get('filter/:category')
+  async filterByCategory(@Param('category') category: string) {
+    const response = await this.storeService.filterByCategory(category);
+    return response;
+  }
+
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateStoreDto: UpdateStoreDto) {
     return this.storeService.update(+id, updateStoreDto);

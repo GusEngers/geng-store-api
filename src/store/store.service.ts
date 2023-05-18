@@ -81,6 +81,21 @@ export class StoreService {
     }
   }
 
+  async filterByCategory(category: string): Promise<Product[]> {
+    if (!isObjectIdOrHexString(category))
+      throw new HttpException('Invalid ID format', HttpStatus.NOT_ACCEPTABLE);
+    try {
+      const response: Product[] = await this.productModel
+        .find({ categories: category })
+        .select('-__v')
+        .populate({ path: 'categories', select: 'name' })
+        .exec();
+      return response;
+    } catch (error) {
+      throw new HttpException(error.message, error.status);
+    }
+  }
+
   update(id: number, updateStoreDto: UpdateStoreDto) {
     return `This action updates a #${id} store`;
   }
