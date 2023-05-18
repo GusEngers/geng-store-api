@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Types } from 'mongoose';
+import { HydratedDocument, Types, isObjectIdOrHexString } from 'mongoose';
 import { Category } from './category.schema';
 
 export type ProductDocument = HydratedDocument<Product>;
@@ -27,8 +27,22 @@ export class Product {
   count: number;
 
   @Prop({
-    required: true,
     ref: 'Category',
+    validate: [
+      {
+        validator: function (categories: Category[]) {
+          return categories.length > 0;
+        },
+        msg: 'Categories is required',
+      },
+      {
+        validator: function (categories: Category[]) {
+          let ids = categories.filter((id) => isObjectIdOrHexString(id));
+          return ids.length === categories.length;
+        },
+        msg: 'Unsupported ID',
+      },
+    ],
   })
   categories: Category[];
 }
