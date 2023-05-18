@@ -96,8 +96,25 @@ export class StoreService {
     }
   }
 
-  update(id: number, updateStoreDto: UpdateStoreDto) {
-    return `This action updates a #${id} store`;
+  async updatePrice(
+    id: string,
+    updateStoreDto: UpdateStoreDto,
+  ): Promise<string> {
+    if (!isObjectIdOrHexString(id))
+      throw new HttpException('Invalid ID format', HttpStatus.NOT_ACCEPTABLE);
+    try {
+      const response = await this.productModel.findById(id);
+      if (!response)
+        throw new HttpException(
+          `Product with ID '${id}' not found`,
+          HttpStatus.NOT_FOUND,
+        );
+      response.price = updateStoreDto.price;
+      await response.save();
+      return `Price for product '${response.name}' updated!`;
+    } catch (error) {
+      throw new HttpException(error.message, error.status);
+    }
   }
 
   remove(id: number) {

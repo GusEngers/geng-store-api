@@ -51,9 +51,13 @@ export class StoreController {
     return response;
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateStoreDto: UpdateStoreDto) {
-    return this.storeService.update(+id, updateStoreDto);
+  @Patch('product/:id')
+  async updatePrice(
+    @Param('id') id: string,
+    @Body() updateStoreDto: UpdateStoreDto,
+  ) {
+    const response = await this.storeService.updatePrice(id, updateStoreDto);
+    return response;
   }
 
   @Delete(':id')
